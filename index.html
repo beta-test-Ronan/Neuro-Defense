@@ -6,175 +6,90 @@
     <title>Neuro-Defense: Neural AI Edition</title>
     <style>
         :root { --neon-green: #4dff88; --neon-red: #ff4d4d; --neon-blue: #0af; --bg-dark: #050510; --neon-purple: #a0f; --neon-orange: #ff8c00; }
-        
-        body { 
-            background: var(--bg-dark); color: white; font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; 
-            height: 100vh; overflow: hidden; touch-action: none; 
-        }
-
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark); z-index: 5000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
+        body { background: var(--bg-dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
+        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .loader-bar { width: 200px; height: 4px; background: #16213e; margin-top: 20px; border-radius: 2px; overflow: hidden; }
         .loader-fill { width: 0%; height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.3s; }
-
         #introModal .modal-content { max-width: 420px; width: 90%; max-height: 95vh; padding: 15px; border: 3px solid var(--neon-blue); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
         #intro-img { width: 100%; max-height: 45vh; object-fit: contain; border-radius: 8px; background: #000; border: 1px solid #333; }
         #intro-text { margin: 10px 0; font-size: 1rem; color: var(--neon-green); font-style: italic; line-height: 1.3; min-height: 3em; }
-
         #hud { width: 100%; max-width: 600px; background: #16213e; padding: 5px 10px; display: flex; flex-direction: column; gap: 2px; border-bottom: 2px solid #444; z-index: 20; box-sizing: border-box; }
         .stats-row { display: flex; justify-content: space-between; font-size: 0.65rem; font-weight: bold; }
         .bar-container { width: 100%; height: 6px; background: #000; border-radius: 3px; border: 1px solid #333; overflow: hidden; }
         .bar-fill { height: 100%; transition: width 0.3s ease; }
         #hp-bar { background: var(--neon-red); }
         #mastery-bar { background: var(--neon-green); }
-
         #game-wrap { position: relative; width: 100vw; max-width: 600px; height: auto; aspect-ratio: 600 / 450; background: #000; border: 1px solid #333; margin-top: 5px; overflow: hidden; }
         canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
-        
-        .modal-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; 
-            z-index: 2000; backdrop-filter: blur(8px); padding: 10px; box-sizing: border-box; 
-            pointer-events: auto;
-        }
-        .modal-content { 
-            background: #1a1a2e; padding: 20px; border-radius: 15px; border: 2px solid #fff; 
-            width: 95%; max-width: 400px; text-align: center; position: relative; 
-            max-height: 90vh; overflow-y: auto; pointer-events: auto; touch-action: auto;
-        }
-        .opt-btn { 
-            background: #0f3460; color: white; border: 1px solid #fff; 
-            padding: 12px 10px; border-radius: 8px; font-size: 0.9rem; cursor: pointer;
-            width: 100%; margin-top: 8px; -webkit-tap-highlight-color: transparent;
-        }
-
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(8px); padding: 10px; box-sizing: border-box; pointer-events: auto; }
+        .modal-content { background: #1a1a2e; padding: 20px; border-radius: 15px; border: 2px solid #fff; width: 95%; max-width: 400px; text-align: center; position: relative; max-height: 90vh; overflow-y: auto; pointer-events: auto; touch-action: auto; }
+        .opt-btn { background: #0f3460; color: white; border: 1px solid #fff; padding: 12px 10px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; width: 100%; margin-top: 8px; -webkit-tap-highlight-color: transparent; }
         #scramble-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 15px 0; }
         .word-pill { background: #2a1a3a; border: 1px solid var(--neon-orange); color: white; padding: 10px 15px; border-radius: 20px; font-size: 0.9rem; cursor: pointer; }
         .word-pill.used { opacity: 0.3; pointer-events: none; }
         #sentence-builder { min-height: 45px; background: rgba(255,255,255,0.05); padding: 10px; border: 1px dashed #555; border-radius: 8px; margin-bottom: 10px; font-weight: bold; color: var(--neon-green); }
-
         #controls { position: absolute; bottom: 10px; left: 10px; pointer-events: none; z-index: 50; }
         .d-pad { display: grid; grid-template-areas: '. u .' 'l . r' '. d .'; gap: 4px; pointer-events: auto; }
         .btn-touch { width: 45px; height: 45px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; }
-
         #word-input { width: 100%; padding: 12px; font-size: 1.1rem; border-radius: 8px; border: 2px solid var(--neon-blue); text-align: center; margin: 10px 0; outline: none; box-sizing: border-box; }
         .correct-ans { color: var(--neon-green); font-weight: bold; font-size: 1.2rem; display: block; margin: 10px 0; }
     </style>
 </head>
 <body>
-
     <div id="loading-screen">
         <h2 style="color: var(--neon-blue);">SISTEMA NEURAL</h2>
         <div class="loader-bar"><div id="load-fill" class="loader-fill"></div></div>
     </div>
-
     <div id="introModal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="intro-title" style="color: var(--neon-blue); margin: 0 0 10px 0; font-size: 0.8rem;">NEURAL LOG</h3>
             <img id="intro-img" src="" alt="">
-            <p id="intro-text"></p>
-            <button class="opt-btn" id="intro-btn" onclick="nextSlide()">NEXT</button>
+            <p id="intro-text" style="margin: 15px 0; font-style: italic; color: var(--neon-green);"></p>
+            <button class="opt-btn" id="intro-btn" onclick="nextSlide()">AWAITING...</button>
         </div>
     </div>
-
     <div id="hud">
         <div class="stats-row"><span>SISTEMA VITAL</span><span id="ui-hp-text">100/100</span></div>
         <div class="bar-container"><div id="hp-bar" class="bar-fill" style="width: 100%;"></div></div>
-        <div class="stats-row" style="margin-top: 4px;">
-            <span>CARGA: <span id="ui-mastery-text">0%</span></span>
-            <span>PTS: <span id="ui-score" style="color:var(--neon-green)">0</span></span>
-            <span>STG: <span id="ui-stage">1</span></span>
-        </div>
+        <div class="stats-row" style="margin-top: 4px;"><span>CARGA: <span id="ui-mastery-text">0%</span></span><span>PTS: <span id="ui-score" style="color:var(--neon-green)">0</span></span><span>STG: <span id="ui-stage">1</span></span></div>
         <div class="bar-container"><div id="mastery-bar" class="bar-fill" style="width: 0%;"></div></div>
     </div>
-
     <div id="game-wrap">
         <canvas id="gameCanvas" width="600" height="450"></canvas>
         <div id="progress-btn" onclick="openStats()" style="position:absolute; top:10px; right:10px; width:40px; height:40px; background:rgba(233,69,96,0.7); border:1px solid #fff; border-radius:50%; display:flex; justify-content:center; align-items:center; cursor:pointer; z-index:50;">📖</div>
-
-        <div id="controls">
-            <div class="d-pad">
-                <div class="btn-touch" style="grid-area:u" onpointerdown="tryMove(0,-1)">▲</div>
-                <div class="btn-touch" style="grid-area:l" onpointerdown="tryMove(-1,0)">◀</div>
-                <div class="btn-touch" style="grid-area:r" onpointerdown="tryMove(1,0)">▶</div>
-                <div class="btn-touch" style="grid-area:d" onpointerdown="tryMove(0,1)">▼</div>
-            </div>
-        </div>
-
+        <div id="controls"><div class="d-pad"><div class="btn-touch" style="grid-area:u" onpointerdown="tryMove(0,-1)">▲</div><div class="btn-touch" style="grid-area:l" onpointerdown="tryMove(-1,0)">◀</div><div class="btn-touch" style="grid-area:r" onpointerdown="tryMove(1,0)">▶</div><div class="btn-touch" style="grid-area:d" onpointerdown="tryMove(0,1)">▼</div></div></div>
         <div id="learningModal" class="modal-overlay">
             <div class="modal-content" id="modal-box">
                 <h3 id="modal-method" style="margin:0; font-size: 0.7rem; color: var(--neon-green);">NEURO-SYNC</h3>
                 <h2 id="word-display" style="margin: 10px 0; font-size: 1.2rem;">...</h2>
                 <div id="options-grid"></div>
-                
-                <div id="orange-area" style="display:none;">
-                    <div id="sentence-builder"></div>
-                    <div id="scramble-container"></div>
-                    <button class="opt-btn" style="background: #444; width: 45%;" onclick="clearOrange()">LIMPAR</button>
-                    <button class="opt-btn" style="background: var(--neon-orange); width: 45%; color: black; font-weight: bold;" onclick="checkOrange()">VALIDAR</button>
-                </div>
-
-                <div id="memory-area" style="display:none;">
-                    <div id="memory-list" style="text-align:left; margin-bottom:15px;"></div>
-                    <button class="opt-btn" style="background: var(--neon-purple);" onclick="startMemoryTest()">ESTOU PRONTO</button>
-                </div>
-
-                <div id="write-area">
-                    <div id="write-hint" style="font-size: 0.7rem; color: #ffca28; display:none; margin-bottom:5px;">QUASE LÁ!</div>
-                    <input type="text" id="word-input" placeholder="Escreva em Inglês!" autocomplete="off">
-                    <button class="opt-btn" style="background: var(--neon-green); color: #000; font-weight:bold;" onclick="checkWriteAnswer()">VALIDAR</button>
-                </div>
-                
-                <div id="feedback-area" style="display:none; margin-top:15px; border-top:1px solid #444; padding-top:10px;">
-                    <p id="correct-msg" class="correct-ans">...</p>
-                    <div id="grammar-note-display" style="font-size:0.75rem; color:var(--neon-blue); padding:5px; background:rgba(0,170,255,0.1); display:none;"></div>
-                    <button class="opt-btn" style="background:#444;" onclick="closeModal()">PRÓXIMO</button>
-                </div>
+                <div id="orange-area" style="display:none;"><div id="sentence-builder"></div><div id="scramble-container"></div><button class="opt-btn" style="background: #444; width: 45%;" onclick="clearOrange()">LIMPAR</button><button class="opt-btn" style="background: var(--neon-orange); width: 45%; color: black; font-weight: bold;" onclick="checkOrange()">VALIDAR</button></div>
+                <div id="memory-area" style="display:none;"><div id="memory-list" style="text-align:left; margin-bottom:15px;"></div><button class="opt-btn" style="background: var(--neon-purple);" onclick="startMemoryTest()">ESTOU PRONTO</button></div>
+                <div id="write-area"><div id="write-hint" style="font-size: 0.7rem; color: #ffca28; display:none; margin-bottom:5px;">QUASE LÁ!</div><input type="text" id="word-input" placeholder="Escreva em Inglês!" autocomplete="off"><button class="opt-btn" style="background: var(--neon-green); color: #000; font-weight:bold;" onclick="checkWriteAnswer()">VALIDAR</button></div>
+                <div id="feedback-area" style="display:none; margin-top:15px; border-top:1px solid #444; padding-top:10px;"><p id="correct-msg" class="correct-ans">...</p><div id="grammar-note-display" style="font-size:0.75rem; color:var(--neon-blue); padding:5px; background:rgba(0,170,255,0.1); display:none;"></div><button class="opt-btn" style="background:#444;" onclick="closeModal()">PRÓXIMO</button></div>
             </div>
         </div>
-
-        <div id="gameOverModal" class="modal-overlay">
-            <div class="modal-content">
-                <h1 style="color: var(--neon-red); margin: 0;">SISTEMA COLAPSADO</h1>
-                <h2 id="final-score-display" style="color: var(--neon-green); font-size: 2rem;">0</h2>
-                <button class="opt-btn" style="background: var(--neon-green); color: #000; font-weight: bold;" onclick="location.reload()">REINICIAR</button>
-            </div>
-        </div>
-
-        <div id="statsModal" class="modal-overlay">
-            <div class="modal-content">
-                <h3>CONHECIMENTO ADQUIRIDO</h3>
-                <div id="session-list" style="max-height:250px; overflow-y:auto; font-size:0.85rem; text-align: left; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border: 1px solid #444;"></div>
-                <button class="opt-btn" style="background: var(--neon-red); margin-top: 15px;" onclick="resetDatabase()">LIMPAR DADOS</button>
-                <button class="opt-btn" onclick="closeStats()">VOLTAR</button>
-            </div>
-        </div>
+        <div id="gameOverModal" class="modal-overlay"><div class="modal-content"><h1 style="color: var(--neon-red); margin: 0;">SISTEMA COLAPSADO</h1><h2 id="final-score-display" style="color: var(--neon-green); font-size: 2rem;">0</h2><button class="opt-btn" style="background: var(--neon-green); color: #000; font-weight: bold;" onclick="location.reload()">REINICIAR</button></div></div>
+        <div id="statsModal" class="modal-overlay"><div class="modal-content"><h3>CONHECIMENTO ADQUIRIDO</h3><div id="session-list" style="max-height:250px; overflow-y:auto; font-size:0.85rem; text-align: left; background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border: 1px solid #444;"></div><button class="opt-btn" style="background: var(--neon-red); margin-top: 15px;" onclick="resetDatabase()">LIMPAR DADOS</button><button class="opt-btn" onclick="closeStats()">VOLTAR</button></div></div>
     </div>
 
 <script src="database.js"></script>
-
 <script>
 const sndAcerto = new Audio('acerto.mp3'); const sndErro = new Audio('erro.mp3');
 let stage = 1, hp = 100, score = 0, enemies = [], dungeonMap = [], isDoorOpen = false, gameActive = true, currentChal = null, shakeTime = 0, boss = null, bossStep = 0, playerSentence = [];
 let mastered = new Set(), mistakes = [], player = { x: 5, y: 4 }, IMGS = {}, currentMemoryData = null;
 const COLS = 12, ROWS = 9; let assetsToLoad = 0, assetsLoaded = 0;
 
-// --- MESTRE NEURAL ---
 class NeuralAI {
     constructor() { this.heat = 1.0; this.consecutiveHits = 0; }
     onAnswer(isCorrect) {
         if (isCorrect) { this.consecutiveHits++; this.heat = Math.min(2.0, this.heat + 0.05); } 
-        else { this.consecutiveHits = 0; this.heat = Math.max(0.5, this.heat - 0.15); }
+        else { this.consecutiveHits = 0; this.heat = 0.5; } // RESETA O HEAT NA HORA PARA AJUDAR
     }
     getEnemyCount() { return Math.floor(2 * this.heat) + Math.floor(stage / 5); }
 }
 const brain = new NeuralAI();
 
-// --- HISTÓRIA ---
 const introSlides = [
     { img: 'foto01.png', text: "Beyond the stars, they observed our world and its treasure: Knowledge." },
     { img: 'foto02.png', text: "They arrived from the void, disconnecting our neural networks." },
@@ -189,20 +104,10 @@ assetsToLoad = Object.keys(ASSETS).length;
 Object.keys(ASSETS).forEach(k => { IMGS[k] = new Image(); IMGS[k].src = ASSETS[k]; IMGS[k].onload = () => { assetsLoaded++; document.getElementById('load-fill').style.width = (assetsLoaded/assetsToLoad*100)+"%"; }; IMGS[k].onerror = () => { assetsLoaded++; }; });
 
 class LearningManager {
-    static save() {
-        localStorage.setItem('neuro_vFinal_AI', JSON.stringify({
-            m: Array.from(mastered), mis: mistakes, stage, hp, sc: score,
-            map: dungeonMap, en: enemies, px: player.x, py: player.y, door: isDoorOpen,
-            battle: currentChal, heat: brain.heat
-        }));
-    }
+    static save() { localStorage.setItem('neuro_vFinal_AI', JSON.stringify({ m: Array.from(mastered), mis: mistakes, stage, hp, sc: score, map: dungeonMap, en: enemies, px: player.x, py: player.y, door: isDoorOpen, battle: currentChal, heat: brain.heat })); }
     static load() {
         const saved = JSON.parse(localStorage.getItem('neuro_vFinal_AI'));
-        if(saved) {
-            mastered = new Set(saved.m); mistakes = saved.mis || []; stage = saved.stage || 1; hp = saved.hp || 100; score = saved.sc || 0;
-            dungeonMap = saved.map || []; enemies = saved.en || []; player.x = saved.px || 5; player.y = saved.py || 4; isDoorOpen = saved.door || false;
-            currentChal = saved.battle || null; brain.heat = saved.heat || 1.0; return true;
-        }
+        if(saved) { mastered = new Set(saved.m); mistakes = saved.mis || []; stage = saved.stage || 1; hp = saved.hp || 100; score = saved.sc || 0; dungeonMap = saved.map || []; enemies = saved.en || []; player.x = saved.px || 5; player.y = saved.py || 4; isDoorOpen = saved.door || false; currentChal = saved.battle || null; brain.heat = saved.heat || 1.0; return true; }
         return false;
     }
     static _genOpts(correct, pool) { let opts = [correct]; while(opts.length < 3) { let r = pool[Math.floor(Math.random()*pool.length)].a; if(r && !opts.includes(r)) opts.push(r); } return opts.sort(() => Math.random() - 0.5); }
@@ -215,12 +120,15 @@ class LearningManager {
         if (type === 'SUPPLY_BOX') { let forcedType = (boxStep === 0) ? "BLUE" : (boxStep === 1) ? "GREEN" : "YELLOW"; const chal = this.getChallenge(forcedType); chal.type = 'SUPPLY_BOX'; chal.method = `🎁 CAIXA: ETAPA ${boxStep + 1} / 3`; return chal; }
         if (type === 'BOSS') { const bossTypes = ["BLUE", "YELLOW", "ORANGE", "RED", "BLACK"]; const chal = this.getChallenge(bossTypes[Math.floor(Math.random() * bossTypes.length)]); chal.method = `🔥 BOSS (${bossStep+1}/15)`; chal.type = 'BOSS'; return chal; } 
         if (type === 'WHITE') { let item = VOCAB_ALL[Math.floor(Math.random() * VOCAB_ALL.length)]; return { item, method: "⚪ RESTAURAÇÃO", options: [item.q, VOCAB_ALL[Math.floor(Math.random()*VOCAB_ALL.length)].q, VOCAB_ALL[Math.floor(Math.random()*VOCAB_ALL.length)].q].sort(()=>Math.random()-0.5), correct: item.q, english: item.q, type: 'WHITE' }; }
+        
         if (type === 'BLUE') { 
             let item = VOCAB_ALL[Math.floor(Math.random() * VOCAB_ALL.length)]; 
             const isRepeat = Math.random() < 0.6;
             return { item, method: isRepeat ? "🔵 REPITA EM INGLÊS" : "🔵 TRADUZA PARA INGLÊS", isWriting: true, english: item.q, correct: item.q, displayQ: isRepeat ? item.q : item.a, type: 'BLUE' }; 
         }
+
         if (type === 'PURPLE') { let seq = [...VOCAB_ALL].sort(() => 0.5 - Math.random()).slice(0, 5); return { method: "💜 SEQUÊNCIA", isMemory: true, sequence: seq, targetIdx: Math.floor(Math.random() * 5), type: 'PURPLE' }; }
+        
         const pool = (Math.random() > 0.5) ? VOCAB_ALL : VOCAB_SENTENCES;
         let item = pool[Math.floor(Math.random() * pool.length)];
         if (type === 'YELLOW') {
@@ -228,7 +136,10 @@ class LearningManager {
             let displayA = isTrue ? item.a : pool[Math.floor(Math.random()*pool.length)].a;
             return { item, method: "🟡 V OU F", options: ["Verdadeiro", "Falso"], correct: isTrue ? "Verdadeiro" : "Falso", english: item.q, displayQ: `"${item.q}" = "${displayA}"?` };
         }
-        const showPassively = Math.random() < 0.4;
+        
+        // AJUSTE DO VERDE PARA INICIANTES
+        let thresholdPassively = (score < 200) ? 0.8 : 0.4;
+        const showPassively = Math.random() < thresholdPassively;
         return { item, method: "🟢 ESCOLHA A CORRETA", options: this._genOpts(item.a, pool), correct: item.a, english: item.q, displayQ: showPassively ? `${item.q} = ${item.a}` : item.q, type: 'GREEN' };
     }
     static update(q, isCorrect) {
@@ -249,19 +160,26 @@ function initRoom(entry) {
     dungeonMap = Array.from({length: ROWS}, (_, r) => Array.from({length: COLS}, (_, c) => (r===0||r===ROWS-1||c===0||c===COLS-1)?1:0));
     enemies = []; isDoorOpen = false; boss = null;
     const totalVocab = VOCAB_ALL.length + VOCAB_SENTENCES.length + VOCAB_GRAMMAR.length;
+    
     if(mastered.size >= totalVocab) { boss = { x: 5, y: 3, alive: true }; } 
     else {
         const count = brain.getEnemyCount();
         for(let i=0; i < count; i++) {
             let tx, ty; do { tx = Math.floor(Math.random()*(COLS-2))+1; ty = Math.floor(Math.random()*(ROWS-2))+1; } while(tx === 5 && ty === 4);
+            
+            // LÓGICA DO MESTRE NEURAL REFINADA PARA SEU PAI
             let types = ["YELLOW", "PURPLE", "GREEN"]; 
+            
+            // Só libera o azul (escrita) se tiver mais de 300 pts e o player não estiver errando (heat)
             if (brain.heat >= 1.0) {
                 if (score >= 300) types.push("BLUE");
                 if (score >= 500) types.push("ORANGE");
                 if (score >= 700) { types.push("RED"); types.push("BLACK"); }
             }
             if (mistakes.length > 0) types.push("PINK");
-            let t = types[Math.floor(Math.random()*types.length)]; if (hp < 50 && Math.random() < 0.3) t = "WHITE";
+
+            let t = types[Math.floor(Math.random()*types.length)];
+            if (hp < 50 && Math.random() < 0.3) t = "WHITE";
             enemies.push({ x: tx, y: ty, type: t, alive: true });
         }
         if(Math.random() < 0.07) { let tx, ty; do { tx = Math.floor(Math.random()*(COLS-2))+1; ty = Math.floor(Math.random()*(ROWS-2))+1; } while(tx === 5 && ty === 4); enemies.push({ x: tx, y: ty, type: 'SUPPLY_BOX', alive: true }); }
@@ -273,7 +191,6 @@ function initRoom(entry) {
 }
 
 function tryMove(dx, dy) { if(!gameActive) return; let nX = player.x + dx, nY = player.y + dy; if(nX<0||nX>=COLS||nY<0||nY>=ROWS||dungeonMap[nY][nX]===1) return; if(dungeonMap[nY][nX]===2 && !isDoorOpen) return; player.x = nX; player.y = nY; LearningManager.save(); if(isDoorOpen && dungeonMap[nY][nX] === 2) { stage++; dungeonMap = []; initRoom((nY===0)?'BOTTOM':(nY===ROWS-1)?'TOP':(nX===0)?'RIGHT':'LEFT'); return; } enemies.forEach((en, i) => { if(en.alive && en.x === player.x && en.y === player.y) startBattle(en, i); }); if(boss && boss.alive && boss.x === player.x && boss.y === player.y) startBossBattle(); }
-
 function startBattle(en, i) { gameActive = false; let chal = (en.type === 'SUPPLY_BOX') ? LearningManager.getChallenge('SUPPLY_BOX', 0) : LearningManager.getChallenge(en.type); currentChal = { ...chal, enemyIdx: i, currentBoxStep: 0 }; LearningManager.save(); renderModal(); }
 
 function renderModal() {
@@ -315,7 +232,7 @@ function updateOrangeBuilder() { document.getElementById("sentence-builder").inn
 function clearOrange() { playerSentence = []; updateOrangeBuilder(); document.querySelectorAll(".word-pill").forEach(p => p.classList.remove("used")); }
 function checkOrange() { processResult(playerSentence.join(" ") === currentChal.correct); }
 function startMemoryTest() { document.getElementById("memory-area").style.display = "none"; document.getElementById("options-grid").style.display = "block"; document.getElementById("options-grid").innerHTML = ""; const target = currentMemoryData.sequence[currentMemoryData.targetIdx]; document.getElementById("word-display").innerText = `QUAL ERA O ${currentMemoryData.targetIdx + 1}º?`; let opts = currentMemoryData.sequence.map(i => i.a).sort(() => Math.random() - 0.5); opts.forEach(opt => { const btn = document.createElement("button"); btn.className = "opt-btn"; btn.innerText = opt; btn.onclick = () => { currentChal.english = target.q; currentChal.item = target; processResult(opt === target.a); }; document.getElementById("options-grid").appendChild(btn); }); }
-function startGame() { const restored = LearningManager.load(); if(!restored) initRoom('NONE'); else initRoom('RESTORE'); update(); }
+function startGame() { const restored = LearningManager.load(); if(!restored) showIntro(); else { if(currentChal) { gameActive = false; renderModal(); } initRoom('RESTORE'); update(); } }
 function startBossBattle() { gameActive = false; bossStep = 0; document.getElementById("modal-box").classList.add("boss-active"); nextBossStep(); }
 function nextBossStep() { if(bossStep >= 15) { alert("SISTEMA RESTAURADO!"); localStorage.clear(); location.reload(); return; } currentChal = { ...LearningManager.getChallenge('BOSS'), enemyIdx: -1 }; LearningManager.save(); renderModal(); }
 function updateHUD() { document.getElementById("ui-hp-text").innerText = hp + "/100"; document.getElementById("hp-bar").style.width = hp + "%"; document.getElementById("ui-score").innerText = score; let total = VOCAB_ALL.length + VOCAB_SENTENCES.length + VOCAB_GRAMMAR.length; let pct = Math.round((mastered.size / total) * 100) || 0; document.getElementById("ui-mastery-text").innerText = pct + "%"; document.getElementById("mastery-bar").style.width = pct + "%"; document.getElementById("ui-stage").innerText = stage; if(hp <= 0) { gameActive = false; document.getElementById("final-score-display").innerText = score; document.getElementById("gameOverModal").style.display = "flex"; } }
@@ -324,19 +241,8 @@ function openStats() { gameActive = false; const list = document.getElementById(
 function resetDatabase() { if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); } }
 function closeStats() { document.getElementById("statsModal").style.display = "none"; gameActive = true; }
 function closeModal() { document.getElementById("learningModal").style.display = "none"; currentChal = null; LearningManager.save(); if(!boss) gameActive = true; }
-function checkWriteAnswer() { 
-    const input = document.getElementById("word-input").value.trim().toLowerCase(); 
-    const correct = currentChal.correct.toLowerCase(); 
-    if (input === correct) processResult(true); 
-    else if (getLevenshteinDistance(input, correct) === 1) { document.getElementById("write-hint").style.display = "block"; shakeTime = 5; } 
-    else processResult(false); 
-}
-
-function getLevenshteinDistance(a, b) {
-    const tmp = []; for (let i = 0; i <= a.length; i++) tmp[i] = [i]; for (let j = 0; j <= b.length; j++) tmp[0][j] = j;
-    for (let i = 1; i <= a.length; i++) { for (let j = 1; j <= b.length; j++) { tmp[i][j] = Math.min(tmp[i-1][j]+1, tmp[i][j-1]+1, tmp[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); } }
-    return tmp[a.length][b.length];
-}
+function checkWriteAnswer() { const input = document.getElementById("word-input").value.trim().toLowerCase(); const correct = currentChal.correct.toLowerCase(); if (input === correct) processResult(true); else if (getLevenshteinDistance(input, correct) === 1) { document.getElementById("write-hint").style.display = "block"; shakeTime = 5; } else processResult(false); }
+function getLevenshteinDistance(a, b) { const tmp = []; for (let i = 0; i <= a.length; i++) tmp[i] = [i]; for (let j = 0; j <= b.length; j++) tmp[0][j] = j; for (let i = 1; i <= a.length; i++) { for (let j = 1; j <= b.length; j++) { tmp[i][j] = Math.min(tmp[i-1][j]+1, tmp[i][j-1]+1, tmp[i-1][j-1]+(a[i-1]===b[j-1]?0:1)); } } return tmp[a.length][b.length]; }
 
 const checkInit = () => { if (typeof VOCAB_ALL !== 'undefined' && assetsLoaded >= Object.keys(ASSETS).length) { document.getElementById('loading-screen').style.display='none'; const restored = LearningManager.load(); if(!restored) showIntro(); else { if(currentChal) { gameActive = false; renderModal(); } initRoom('RESTORE'); update(); } } else setTimeout(checkInit, 100); };
 checkInit();
