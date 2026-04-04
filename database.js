@@ -1295,7 +1295,17 @@ VOCAB_FORM_SENTENCE = [
 { q: "Complete: I must ___ between these two options", target: "CHOOSE", a: "choose", opts: ["choose", "chooses", "chosen"] },
 { q: "Complete: He ___ a secret between us", target: "KEEP", a: "kept", opts: ["keep", "keeps", "kept"] },
 { q: "Complete: The link ___ the events is clear", target: "PREPOSITION", a: "between", opts: ["between", "with", "of"] },
-{ q: "Complete: I will ___ for you between 5 and 6", target: "WAIT", a: "wait", opts: ["wait", "waits", "waiting"] }
+{ q: "Complete: I will ___ for you between 5 and 6", target: "WAIT", a: "wait", opts: ["wait", "waits", "waiting"] },
+{ q: "Complete: ___! How are you?", target: "HELLO", a: "hello", opts: ["hello", "wow", "ouch"] },
+{ q: "Complete: ___! That’s amazing!", target: "WOW", a: "wow", opts: ["wow", "ugh", "oops"] },
+{ q: "Complete: ___! I hurt my arm!", target: "OUCH", a: "ouch", opts: ["ouch", "yay", "hello"] },
+{ q: "Complete: ___! I forgot my keys!", target: "OOPS", a: "oops", opts: ["oops", "hi", "bravo"] },
+{ q: "Complete: ___! We won the game!", target: "YAY", a: "yay", opts: ["yay", "ugh", "huh"] },
+{ q: "Complete: ___! Be quiet, please.", target: "SHH", a: "shh", opts: ["shh", "wow", "yo"] },
+{ q: "Complete: ___! I don’t understand.", target: "HUH", a: "huh", opts: ["huh", "yay", "hello"] },
+{ q: "Complete: ___! That’s disgusting!", target: "YUCK", a: "yuck", opts: ["yuck", "wow", "hi"] },
+{ q: "Complete: ___! Come here for a second.", target: "HEY", a: "hey", opts: ["hey", "ouch", "ugh"] },
+{ q: "Complete: ___! Finally finished!", target: "AH", a: "ah", opts: ["ah", "oops", "psst"] }
 ];
 
 
